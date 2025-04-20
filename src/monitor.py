@@ -3,8 +3,8 @@ from time import sleep
 import sys
 import os
 from dotenv import load_dotenv
-
-import simpleaudio as sa
+import random
+from playaudio import playaudio
 
 COM = 'COM6'
 BAUD = 9600
@@ -21,23 +21,26 @@ print(ser.name)
 if ("-m" in sys.argv or "--monitor" in sys.argv):
     monitor = True
 else:
-    monitor = False
+    quit()
 
-while True:
-    # Capture serial output as a decoded string
-    val = str(ser.readline().decode().strip('\r\n'))
+try:
+    while True:
+        rand = random.randint(1, 3)
+        # Capture serial output as a decoded string
+        val = str(ser.readline().decode().strip('\r\n'))
+        
+        #parse int value
+        if (val[-2:]):
+            num = int(val[-2:])
 
-    #parse int value
-    if (val[-2:]):
-        num = int(val[-2:])
+        if (monitor == True):
+            # print(val, end="\r", flush=True) #full output
+            print(num, end="\r", flush=True)
 
-    if (monitor == True):
-        # print(val, end="\r", flush=True) #full output
-        print(num, end="\r", flush=True)
+        #will need to tweak for osil
+        if (num > 6):
+            playaudio(os.getenv("ABS_PATH") + "audio" + str(rand) + ".mp3")
+        
+except KeyboardInterrupt:
+    quit()
 
-    #will need to tweak    
-    if (num > 6):
-        print("GOT")
-        wave_obj = sa.WaveObject.from_wave_file(os.getenv("ABS_PATH")) #set absolute path to audio file here
-        play_obj = wave_obj.play()
-        play_obj.wait_done()
